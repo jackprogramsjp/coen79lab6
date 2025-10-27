@@ -31,6 +31,7 @@ namespace csen79 {
 		bool insert(T &);
 		void erase(Person::ID_t);
 		void testRoster();
+		void extraTestRoster();
 		friend iterator;
 
 		iterator begin();

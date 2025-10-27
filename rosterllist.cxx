@@ -11,39 +11,6 @@
 #include "roster.h"
 #include "rosterllist.h"
 
-// bool RosterLList::insert(T &rec) {
-//     Node *n = new(std::nothrow) Node(rec);
-//     if (!n) return false;
-//
-//     if (!head) {                 // empty list → new head
-//         head = n;
-//         return true;
-//     }
-//
-//     // walk to tail and append
-//     Node *curr = head;
-//     while (curr->next) curr = curr->next;
-//     curr->next = n;
-//     return true;
-// }
-
-// void RosterLList::erase(Person::ID_t id) {
-// 	Node *prev = nullptr;
-// 	Node *curr = head;
-//
-// 	while (curr && curr->data.getID() != id) {
-// 		prev = curr;
-// 		curr = curr->next;
-// 	}
-// 	if (!curr) return;               // not found
-//
-// 	if (!prev) head = curr->next;    // deleting head
-// 	else       prev->next = curr->next;
-//
-// 	delete curr;
-// }
-
-
 namespace csen79 {
 	// STUDENT WORKS
 	// IMPLEMENT ALL THESE FUNCTIONS
@@ -88,6 +55,14 @@ namespace csen79 {
 		return *this;
 	}
 
+	RosterLList::iterator RosterLList::begin() {
+		return RosterLList::iterator(head);
+	}
+
+	RosterLList::iterator RosterLList::end() {
+		return RosterLList::iterator(nullptr); // one past-the-end
+	}
+
 	// RosterLList
 
 	RosterLList::RosterLList() {
@@ -106,70 +81,28 @@ namespace csen79 {
 		head = nullptr;
 	}
 
-	RosterLList::iterator RosterLList::begin() {
-		return RosterLList::iterator(head);
-	}
-
-	RosterLList::iterator RosterLList::end() {
-		return RosterLList::iterator(nullptr); // one past-the-end
-	}
-
-	// Insertion should keep list sorted by ID of perosn (ascending)
-	// If ID is equal (existing), we update that node's data (replace) and succeed
+	// Insertion at the end
 	// Allocation failure returns false
 	bool RosterLList::insert(T &rec) {
 		Node *n = new(std::nothrow) Node(rec);
 
 		if (!n) return false; // Allocation failed
 
-		// Conditions:
-		// if head is null
-		// or
-		// is the new record's ID smaller than the current first record's ID
-		//
-		// THIS KEEPS LIST SORTED BY ID NUMBERS IN ASCENDING ORDER
-		// Basically, this checks whether the new node should be inserted at the front of the list.
-		if (!head || rec.getID() < head->data.getID()) {
-			n->next = head; // Set the new node's next pointer to the current head
+		// If head is null, this is empty list so insert node at head.
+		if (!head) {
 			head = n; // Update head pointer so list starts with our new node
 			return true;
 		}
 
-		// Keep iterating/walking all the way to insertion point
-		Node *prev = nullptr;
+		// Get the current head node
 		Node *curr = head;
 
-		// This is to keep list sorted by ID numbers in ascending order,
-		// basically, keep iterating until rec ID is no longer bigger
-		while (curr && curr->data.getID() < rec.getID()) {
-			prev = curr; // Current node becomes previous node
-			curr = curr->next; // Go to next node
-		}
+		// Iterate through each next node while it is not null
+		while (curr->next)
+			curr = curr->next;
 
-		// Duplicate ID, then replace
-		if (curr && curr->data.getID() == rec.getID()) {
-			curr->data = rec; // Update node's data
-			delete n; // We allocated one before, but we don't need it any more, so free it to prevent leak
-			return true;
-		}
-
-		// Dummy/sentinel head node can obviously be added to remove special cases for the head.
-		// But here, we know prev basically can never be null.
-		//
-		// Case 1: Empty list or new head (already returned)
-		// Case 2: Traversing to insertion point (prev has been assigned at least once due to case 1)
-		// Case 3: Duplicate ID (returned)
-		//
-		// Case 4: Insertion between prev and curr
-		// prev should never be null,
-		// it would only be null if the new node should go before the head,
-		// but this was already handled in case 1
-		assert(prev != nullptr);
-
-		// Insert between prev and curr
-		prev->next = n;
-		n->next = curr;
-
+		// Assign next node to n
+		curr->next = n;
 		return true;
 	}
 

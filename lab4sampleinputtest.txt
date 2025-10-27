@@ -1,0 +1,4 @@
+1. Empty print and no operation erases
+2. Append insertion order and head/middle/tail erase
+3. Duplicate ID is appended
+4. Appends, erases, prints
